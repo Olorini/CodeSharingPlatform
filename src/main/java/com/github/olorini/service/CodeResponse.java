@@ -1,7 +1,8 @@
-package com.github.olorini;
+package com.github.olorini.service;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.github.olorini.db.Snippet;
 
 import java.sql.Timestamp;
 
@@ -13,7 +14,7 @@ public class CodeResponse {
 
 	public CodeResponse() { }
 
-	public CodeResponse(CodeModel model) {
+	public CodeResponse(Snippet model) {
 		this.code = model.getCode();
 		this.date = model.getCreateDate();
 	}

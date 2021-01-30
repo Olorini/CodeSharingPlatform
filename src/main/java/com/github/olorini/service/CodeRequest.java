@@ -1,4 +1,4 @@
-package com.github.olorini;
+package com.github.olorini.service;
 
 public class CodeRequest {
 

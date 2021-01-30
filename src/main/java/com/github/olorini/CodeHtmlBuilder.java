@@ -1,5 +1,6 @@
 package com.github.olorini;
 
+import com.github.olorini.db.Snippet;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
@@ -33,7 +34,7 @@ public class CodeHtmlBuilder {
 		}
 	}
 
-	public String getCodeSnippet(CodeModel model) {
+	public String getCodeSnippet(Snippet model) {
 		try {
 			return getHtml("code_snippet_template.ftlh", createViewHtmlBinding(model));
 		} catch (TemplateException | IOException e) {
@@ -42,7 +43,7 @@ public class CodeHtmlBuilder {
 		}
 	}
 
-	public String getLatestCodeSnippets(List<CodeModel> models) {
+	public String getLatestCodeSnippets(List<Snippet> models) {
 		try {
 			return getHtml("latest_code_snippets_template.ftlh", createLatestViewsHtmlBinding(models));
 		} catch (TemplateException | IOException e) {
@@ -80,14 +81,14 @@ public class CodeHtmlBuilder {
 		return out.toString();
 	}
 
-	private Map<String, Object> createLatestViewsHtmlBinding(List<CodeModel> models) {
+	private Map<String, Object> createLatestViewsHtmlBinding(List<Snippet> models) {
 		Map<String, Object> binding = new HashMap<>();
 		binding.put("title", "Latest");
 		binding.put("snippets", models);
 		return binding;
 	}
 
-	private Map<String, Object> createViewHtmlBinding(CodeModel model) {
+	private Map<String, Object> createViewHtmlBinding(Snippet model) {
 		Map<String, Object> binding = new HashMap<>();
 		binding.put("title", "Code");
 		binding.put("snippet", model);
