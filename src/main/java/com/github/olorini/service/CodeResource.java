@@ -1,5 +1,6 @@
 package com.github.olorini.service;
 
+import com.github.olorini.ecxeptions.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,15 +23,15 @@ public class CodeResource {
 		this.codeService = codeService;
 	}
 
-	@GetMapping(path = "/api/code/{id}")
-	public CodeResponse getApiCodeSnippet(@PathVariable Integer id) {
-		return codeService.getCode(id);
+	@PostMapping(path = "/api/code/new", consumes = "application/json")
+	public Map<String, String> createApiCodeSnippet(@RequestBody CodeRequest request) {
+		String id = codeService.createCode(request);
+		return Collections.singletonMap("id", id);
 	}
 
-	@PostMapping(path = "/api/code/new", consumes = "application/json")
-	public Map<String, Long> createApiCodeSnippet(@RequestBody CodeRequest request) {
-		long id = codeService.createCode(request);
-		return Collections.singletonMap("id", id);
+	@GetMapping(path = "/api/code/{id}")
+	public CodeResponse getApiCodeSnippet(@PathVariable String id) throws ResourceNotFoundException {
+		return codeService.getCode(id);
 	}
 
 	@GetMapping(path = "/api/code/latest")
@@ -38,16 +39,17 @@ public class CodeResource {
 		return codeService.getLatestSnippets();
 	}
 
-	@GetMapping(path = "/code/{id}")
-	public String getCodeSnippet(HttpServletResponse response, @PathVariable Integer id) {
-		response.addHeader("Content-Type", "text/html");
-		return codeService.getHtmlCodePage(id);
-	}
 
 	@GetMapping(path = "/code/new")
 	public String createCodeSnippet(HttpServletResponse response) {
 		response.addHeader("Content-Type", "text/html");
 		return codeService.getHtmlInputForm();
+	}
+
+	@GetMapping(path = "/code/{id}")
+	public String getCodeSnippet(HttpServletResponse response, @PathVariable String id) {
+		response.addHeader("Content-Type", "text/html");
+		return codeService.getHtmlCodePage(id);
 	}
 
 	@GetMapping(path = "/code/latest")

@@ -3,37 +3,41 @@ package com.github.olorini.db;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Objects;
+import java.util.UUID;
 
-@Entity
+@Entity(name = "snippets")
 @Table(name = "snippets")
 public class Snippet {
 
 	@Id
 	@Column
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	Long id;
+	private String id;
 
 	@Column
-	String code;
+	private String code;
 
 	@Column
-	Timestamp createDate;
+	private Timestamp createDate;
 
-	public Snippet() {
-		this.code = "public static void main(String[] args) {\n    SpringApplication.run(CodeSharingPlatform.class, args);\n}";
-		this.createDate = Timestamp.valueOf(LocalDateTime.now());
-	}
+	@Column
+	private Timestamp timeOfDisable;
 
-	public Snippet(String code) {
+	@Column
+	private Integer viewsCount;
+
+	public Snippet() { }
+
+	public Snippet(String code, int time, int views) {
+		this.id = UUID.randomUUID().toString();
 		this.code = code;
 		this.createDate = Timestamp.valueOf(LocalDateTime.now());
+		this.viewsCount = (views > 0) ? views : null;
+		this.timeOfDisable = (time > 0) ? Timestamp.from(createDate.toInstant().plusSeconds(time)) : null;
 	}
 
 	public String getCode() {
@@ -52,12 +56,28 @@ public class Snippet {
 		this.createDate = createDate;
 	}
 
-	public Long getId() {
+	public String getId() {
 		return id;
 	}
 
-	public void setId(Long id) {
+	public void setId(String id) {
 		this.id = id;
+	}
+
+	public Timestamp getTimeOfDisable() {
+		return timeOfDisable;
+	}
+
+	public void setTimeOfDisable(Timestamp timeOfDisable) {
+		this.timeOfDisable = timeOfDisable;
+	}
+
+	public Integer getViewsCount() {
+		return viewsCount;
+	}
+
+	public void setViewsCount(Integer views) {
+		this.viewsCount = views;
 	}
 
 	@Override
@@ -72,5 +92,9 @@ public class Snippet {
 	@Override
 	public int hashCode() {
 		return Objects.hash(getCode(), getCreateDate());
+	}
+
+	public void decrementViews() {
+		this.viewsCount--;
 	}
 }

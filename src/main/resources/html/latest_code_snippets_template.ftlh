@@ -27,9 +27,8 @@
     </head>
     <body>
     <#list snippets as snippet>
-        <span id="load_date"><#if snippet.createDate??>${(snippet.createDate)?string("dd/MM/yyyy HH:mm:ss")}<#else> </#if></span>
-        <pre id="code_snippet"><code><#if snippet.code??>${snippet.code}<#else></#if></code>
-        </pre>
+        <span id="load_date"><#if snippet.date??>${(snippet.date)?string("dd/MM/yyyy HH:mm:ss")}<#else> </#if></span>
+        <pre id="code_snippet"><code><#if snippet.code??>${snippet.code}<#else></#if></code></pre>
     </#list>
     </body>
 </html>

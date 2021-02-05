@@ -3,6 +3,7 @@ package com.github.olorini.service;
 import com.github.olorini.CodeHtmlBuilder;
 import com.github.olorini.db.Snippet;
 import com.github.olorini.db.SnippetRepository;
+import com.github.olorini.ecxeptions.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -21,27 +22,39 @@ public class CodeService {
 		this.repository = repository;
 	}
 
-	CodeResponse getCode(long id) {
-		Optional<Snippet> snippet = repository.findById(id);
-		return snippet.map(CodeResponse::new).orElse(null);
+	CodeResponse getCode(String id) throws ResourceNotFoundException {
+		Optional<Snippet> optionalSnippet = repository.findAccessibleSnippet(id);
+		if (optionalSnippet.isPresent()) {
+			Snippet snippet = optionalSnippet.get();
+			if (snippet.getViewsCount()!= null && snippet.getViewsCount() > 0) {
+				snippet.decrementViews();
+				repository.save(snippet);
+			}
+			return new CodeResponse(snippet);
+		}
+		throw new ResourceNotFoundException();
 	}
 
-	public long createCode(CodeRequest request) {
-		Snippet snippet = new Snippet(request.getCode());
-		Snippet answer = repository.save(snippet);
+	public String createCode(CodeRequest request) {
+		Snippet snippet = new Snippet(request.getCode(), request.getTime(), request.getViews());
+ 		Snippet answer = repository.save(snippet);
 		return answer.getId();
 	}
 
 	public List<CodeResponse> getLatestSnippets() {
-		List<Snippet> latestSnippets = repository.findTop10ByOrderByIdDesc();
+		List<Snippet> latestSnippets = repository.findLatest10Snippets();
 		return latestSnippets.stream()
 				.map(CodeResponse::new)
 				.collect(Collectors.toList());
 	}
 
-	String getHtmlCodePage(long id) {
-		Optional<Snippet> snippet = repository.findById(id);
-		return snippet.map(builder::getCodeSnippet).orElse(builder.getPageNotFound());
+	String getHtmlCodePage(String id) {
+		try {
+			CodeResponse response = getCode(id);
+			return builder.getCodeSnippet(response);
+		} catch (ResourceNotFoundException e) {
+			return builder.getPageNotFound();
+		}
 	}
 
 	String getHtmlInputForm() {
@@ -49,7 +62,7 @@ public class CodeService {
 	}
 
 	String getHtmlLatestSnippets() {
-		List<Snippet> latestSnippets = repository.findTop10ByOrderByIdDesc();
+		List<CodeResponse> latestSnippets = getLatestSnippets();
 		return builder.getLatestCodeSnippets(latestSnippets);
 	}
 

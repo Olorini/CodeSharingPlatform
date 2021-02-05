@@ -1,6 +1,6 @@
 package com.github.olorini;
 
-import com.github.olorini.db.Snippet;
+import com.github.olorini.service.CodeResponse;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
@@ -34,18 +34,18 @@ public class CodeHtmlBuilder {
 		}
 	}
 
-	public String getCodeSnippet(Snippet model) {
+	public String getCodeSnippet(CodeResponse response) {
 		try {
-			return getHtml("code_snippet_template.ftlh", createViewHtmlBinding(model));
+			return getHtml("code_snippet_template.ftlh", createViewHtmlBinding(response));
 		} catch (TemplateException | IOException e) {
 			LOGGER.error(e.getMessage());
 			return null;
 		}
 	}
 
-	public String getLatestCodeSnippets(List<Snippet> models) {
+	public String getLatestCodeSnippets(List<CodeResponse> responses) {
 		try {
-			return getHtml("latest_code_snippets_template.ftlh", createLatestViewsHtmlBinding(models));
+			return getHtml("latest_code_snippets_template.ftlh", createLatestViewsHtmlBinding(responses));
 		} catch (TemplateException | IOException e) {
 			LOGGER.error(e.getMessage());
 			return null;
@@ -81,14 +81,14 @@ public class CodeHtmlBuilder {
 		return out.toString();
 	}
 
-	private Map<String, Object> createLatestViewsHtmlBinding(List<Snippet> models) {
+	private Map<String, Object> createLatestViewsHtmlBinding(List<CodeResponse> models) {
 		Map<String, Object> binding = new HashMap<>();
 		binding.put("title", "Latest");
 		binding.put("snippets", models);
 		return binding;
 	}
 
-	private Map<String, Object> createViewHtmlBinding(Snippet model) {
+	private Map<String, Object> createViewHtmlBinding(CodeResponse model) {
 		Map<String, Object> binding = new HashMap<>();
 		binding.put("title", "Code");
 		binding.put("snippet", model);
